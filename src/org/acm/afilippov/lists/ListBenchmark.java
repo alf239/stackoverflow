@@ -18,7 +18,7 @@ public class ListBenchmark {
         for (Integer[] integers : src) {
             addAll(result, integers);
         }
-        return result.toArray(new Integer[0]);
+        return result.toArray(new Integer[result.size()]);
     }
 
     private static Integer[] arrayJoin(Integer[]... src) {
@@ -26,7 +26,19 @@ public class ListBenchmark {
         for (Integer[] integers : src) {
             addAll(result, integers);
         }
-        return result.toArray(new Integer[0]);
+        return result.toArray(new Integer[result.size()]);
+    }
+
+    private static Integer[] preAllocatedArrayJoin(Integer[]... src) {
+        int len = 0;
+        for (Integer[] ints : src) {
+            len += ints.length;
+        }
+        ArrayList<Integer> result = new ArrayList<Integer>(len);
+        for (Integer[] integers : src) {
+            addAll(result, integers);
+        }
+        return result.toArray(new Integer[result.size()]);
     }
 
     private static int sum(Integer[] numbers) {
@@ -50,34 +62,31 @@ public class ListBenchmark {
     }
 
     public static void main(String[] args) {
-        // warm-up
-        for (int i = 0; i < 100; i++) {
-            final Integer[][] ints = sampleData();
-            final Integer[] integers = listJoin(ints);
-            System.out.println("sum(integers) = " + sum(integers));
-            final Integer[] integers1 = arrayJoin(ints);
-            System.out.println("sum(integers1) = " + sum(integers1));
-        }
-
         long totalsum = 0;
         for (int i = 0; i < 1000; i++) {
             final Integer[][] ints = sampleData();
 
-            long t2 = System.currentTimeMillis();
-            final Integer[] integers1 = arrayJoin(ints);
-            System.out.print(System.currentTimeMillis() - t2);
-            System.out.print("\n");
-
-            long t1 = System.currentTimeMillis();
-            final Integer[] integers = listJoin(ints);
+            final long t1 = System.currentTimeMillis();
+            final Integer[] integers1 = listJoin(ints);
             System.out.print(System.currentTimeMillis() - t1);
             System.out.print("\t");
 
+            final long t2 = System.currentTimeMillis();
+            final Integer[] integers2 = arrayJoin(ints);
+            System.out.print(System.currentTimeMillis() - t2);
+            System.out.print("\t");
+
+            final long t3 = System.currentTimeMillis();
+            final Integer[] integers3 = preAllocatedArrayJoin(ints);
+            System.out.print(System.currentTimeMillis() - t3);
+            System.out.print("\n");
+
             System.gc();
             System.gc();
 
-            totalsum += sum(integers);
             totalsum += sum(integers1);
+            totalsum += sum(integers2);
+            totalsum += sum(integers3);
         }
         System.out.println("total sum = " + totalsum);
     }
