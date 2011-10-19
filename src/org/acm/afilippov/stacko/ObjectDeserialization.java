@@ -13,16 +13,23 @@ public class ObjectDeserialization {
                 "If several ObjectOutputStreams were used to write to the same file in succession, " +
                 "it will not. Ð Tom Anderson 4 mins ago";
 
-        FileOutputStream fos = new FileOutputStream(FILENAME);
-        for (String s : test.split("\\s+")) {
-            ObjectOutputStream oos = new ObjectOutputStream(fos);
-            oos.writeObject(s);
+        FileOutputStream fos = null;
+        try {
+            fos = new FileOutputStream(FILENAME);
+            for (String s : test.split("\\s+")) {
+                ObjectOutputStream oos = new ObjectOutputStream(fos);
+                oos.writeObject(s);
+            }
+        } finally {
+            if (fos != null)
+                fos.close();
         }
 
         List<Object> results = new ArrayList<Object>();
-        FileInputStream fis = new FileInputStream(FILENAME);
 
+        FileInputStream fis = null;
         try {
+            fis = new FileInputStream(FILENAME);
             while (true) {
                 ObjectInputStream ois = new ObjectInputStream(fis);
                 results.add(ois.readObject());
@@ -30,7 +37,8 @@ public class ObjectDeserialization {
         } catch (EOFException ignored) {
             // as expected
         } finally {
-            fis.close();
+            if (fis != null)
+                fis.close();
         }
         System.out.println("results = " + results);
     }
