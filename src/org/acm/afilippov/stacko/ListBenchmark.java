@@ -1,4 +1,4 @@
-package org.acm.afilippov.lists;
+package org.acm.afilippov.stacko;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
