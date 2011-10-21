@@ -7,7 +7,7 @@ public class VolatileExample implements Runnable {
         long i = 0;
         while (flag) {
             if (i++ % 10000000000L == 0)
-                System.out.println("Waiting " + System.currentTimeMillis());
+                System.out.println("Waiting  " + System.currentTimeMillis());
         }
     }
 
@@ -16,8 +16,11 @@ public class VolatileExample implements Runnable {
         thread.start();
         Thread.sleep(10000L);
         flag = false;
-        System.out.println("stopping " + System.currentTimeMillis());
-
+        long start = System.currentTimeMillis();
+        System.out.println("stopping " + start);
         thread.join();
+        long end = System.currentTimeMillis();
+        System.out.println("stopped  " + end);
+        System.out.println("Delay: " + ((end - start) / 1000L));
     }
 }
